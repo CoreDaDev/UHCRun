@@ -36,7 +36,6 @@ class ArenaListener implements Listener {
         if(!$player instanceof Player) return;
         if($this->arena->getPlayerManager()->getPlayerState($player) == PlayerStatus::PLAYER_OFFLINE) return;
         if($e->getTarget()->getFolderName() != $this->arena->levelName && $e->getTarget()->getFolderName() != UHCRun::getInstance()->getWaitLobby()->getLevel()->getFolderName()) {
-            var_dump("sa");
             $this->arena->getPlayerManager()->removeAlivePlayer($player, false, false);
             $this->arena->getPlayerManager()->removeSpectator($player);
             $this->arena->getPlayerManager()->removeDeadPlayer($player);
