@@ -134,7 +134,7 @@ class ArenaTask extends Task {
                 }
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["meetup-message"]);
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-10sec"]);
-                UHCRun::getInstance()->getScheduler()->scheduleDelayedTask(new EnablePvPTask, 200);
+                UHCRun::getInstance()->getScheduler()->scheduleDelayedTask(new EnablePvPTask($arena), 200);
             } else if($this->eventCalc() == "endhalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["end-last1"]);
             } else if($this->eventCalc() == "end") {
