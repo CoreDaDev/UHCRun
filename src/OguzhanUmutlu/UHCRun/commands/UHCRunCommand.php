@@ -115,7 +115,6 @@ class UHCRunCommand {
             $arena->status = ArenaStatus::STATUS_STARTED;
             $arena->setFlag("break", true);
             $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["event-invincibility"]);
-            $this->countdown = 0;
             foreach($arena->getPlayerManager()->getAlivePlayers() as $pl) {
                 $x = random_int(0-$arena->border, $arena->border);
                 $z = random_int(0-$arena->border, $arena->border);
