@@ -1,0 +1,34 @@
+---
+name: UHCRun
+description: UHCRun plugin for PocketMine-MP
+api: 3.0.0
+version: 1.0.0
+main: OguzhanUmutlu\UHCRun\UHCRun
+
+commands:
+  uhcrun:
+    description: UHCRun main command
+    permission: uhcrun.command
+  uhcrunjoin:
+    description: Join a UHCRun arena!
+    permission: uhcrun.join
+  uhcrunleave:
+    description: Leave from a UHCRun arena!
+    permission: uhcrun.leave
+  uhcrunrejoin:
+    description: Rejoin to your last UHCRun arena!
+    permission: uhcrun.rejoin
+permissions:
+  uhcrun.command:
+    description: UHCRun main command
+    default: op
+  uhcrun.join:
+    description: Join a UHCRun arena!
+    default: op
+  uhcrun.leave:
+    description: Leave from a UHCRun arena!
+    default: op
+  uhcrun.rejoin:
+    description: Rejoin to your last UHCRun arena!
+    default: op
+...
