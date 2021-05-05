@@ -134,17 +134,7 @@ class ArenaTask extends Task {
                 }
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["meetup-message"]);
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-10sec"]);
-                UHCRun::getInstance()->getScheduler()->scheduleDelayedTask(new class($arena) extends Task{
-                    public $arena;
-                    public function __construct(Arena $arena) {
-                        $this->arena = $arena;
-                    }
-                    public function onRun(int $currentTick) {
-                        $this->arena->setFlag("pvp", true);
-                        $this->arena->setFlag("invincibility", false);
-                        $this->arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-message"]);
-                    }
-                }, 200);
+                UHCRun::getInstance()->getScheduler()->scheduleDelayedTask(new EnablePvPTask, 200);
             } else if($this->eventCalc() == "endhalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["end-last1"]);
             } else if($this->eventCalc() == "end") {
