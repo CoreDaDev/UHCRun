@@ -100,7 +100,7 @@ class ScoreboardManager {
                 default:
                     $event = "Nothing";
             }
-            $data = array_merge($data, array_map(function($n)use($min,$sec,$event,$pl){
+            $data = array_merge($data, array_map(function($n)use($min,$sec,$event){
                 return str_replace([
                     "{players}",
                     "{endsin}",
