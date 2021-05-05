@@ -4,6 +4,7 @@ namespace OguzhanUmutlu\UHCRun\utils;
 
 use OguzhanUmutlu\UHCRun\arena\Arena;
 use OguzhanUmutlu\UHCRun\arena\ArenaStatus;
+use OguzhanUmutlu\UHCRun\events\GamePlayerDeathEvent;
 use OguzhanUmutlu\UHCRun\UHCRun;
 use pocketmine\item\Item;
 use pocketmine\level\format\io\BaseLevelProvider;
@@ -144,6 +145,10 @@ class PlayerManager {
             ));
             $this->addDeadPlayer($player);
             $this->addSpectator($player);
+            (new GamePlayerDeathEvent(
+                $this->arena,
+                $player
+            ))->call();
         } else {
             $this->broadcast("message", str_replace(
                 ["{player}", "{players}"],

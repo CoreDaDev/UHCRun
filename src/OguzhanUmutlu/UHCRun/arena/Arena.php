@@ -2,9 +2,12 @@
 
 namespace OguzhanUmutlu\UHCRun\arena;
 
+use OguzhanUmutlu\UHCRun\events\BorderChangeEvent;
+use OguzhanUmutlu\UHCRun\events\GameFlagUpdateEvent;
 use OguzhanUmutlu\UHCRun\scoreboard\ScoreboardManager;
 use OguzhanUmutlu\UHCRun\UHCRun;
 use OguzhanUmutlu\UHCRun\utils\PlayerManager;
+use pocketmine\event\Event;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 
@@ -58,7 +61,22 @@ class Arena {
 
     public function setFlag(string $flag, bool $value): void {
         if(!isset($this->flags[$flag])) return;
+        (new GameFlagUpdateEvent(
+            $this,
+            $flag,
+            $this->getFlag($flag),
+            $value
+        ))->call();
         $this->flags[$flag] = $value;
+    }
+
+    public function setBorder(int $size): void {
+        (new BorderChangeEvent(
+            $this,
+            $this->border,
+            $size
+        ))->call();
+        $this->border = $size;
     }
 
     public function getPlayerManager(): PlayerManager {

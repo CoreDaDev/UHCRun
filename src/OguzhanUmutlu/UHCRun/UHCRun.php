@@ -7,7 +7,6 @@ use OguzhanUmutlu\UHCRun\commands\UHCRunCommand;
 use OguzhanUmutlu\UHCRun\manager\ArenaManager;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;

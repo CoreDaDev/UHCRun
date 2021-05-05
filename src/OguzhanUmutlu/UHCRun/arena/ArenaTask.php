@@ -2,6 +2,7 @@
 
 namespace OguzhanUmutlu\UHCRun\arena;
 
+use OguzhanUmutlu\UHCRun\events\GameEventEvent;
 use OguzhanUmutlu\UHCRun\UHCRun;
 use OguzhanUmutlu\UHCRun\utils\PlayerStatus;
 use pocketmine\entity\Effect;
@@ -75,6 +76,10 @@ class ArenaTask extends Task {
                     $z = random_int(0-$arena->border, $arena->border);
                     $player->teleport(new Position($x, 100, $z, $arena->level));
                 }
+                (new GameEventEvent(
+                    $arena,
+                    GameEventEvent::EVENT_START
+                ))->call();
             }
         } else if($arena->status == ArenaStatus::STATUS_STARTED) {
             if(count($arena->getPlayerManager()->getAlivePlayers()) < 2) {
@@ -102,23 +107,42 @@ class ArenaTask extends Task {
             }
             if($this->eventCalc() == "invincibility") {
                 $arena->setFlag("invincibility", false);
+                (new GameEventEvent(
+                    $arena,
+                    GameEventEvent::EVENT_INVINCIBILITY
+                ))->call();
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["invincibility-end"]);
             } else if($this->eventCalc() == "bordershrinkhalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["border-shrink-last1"]);
             } else if($this->eventCalc() == "bordershrink") {
                 $arena->setFlag("bordershrink", true);
+                (new GameEventEvent(
+                    $arena,
+                    GameEventEvent::EVENT_BORDER_SHRINK
+                ))->call();
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["border-shrink-message"]);
             } else if($this->eventCalc() == "lasthealhalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["last-heal-last1"]);
             } else if($this->eventCalc() == "lastheal") {
+                $beforeHeal = [];
                 foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {
+                    $beforeHeal[$player->getName()] = $player->getHealth();
                     $player->setHealth($player->getMaxHealth());
                 }
+                (new GameEventEvent(
+                    $arena,
+                    GameEventEvent::EVENT_LAST_HEAL,
+                    $beforeHeal
+                ))->call();
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["last-heal-message"]);
             } else if($this->eventCalc() == "pvphalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-last1"]);
             } else if($this->eventCalc() == "pvp") {
                 $arena->setFlag("pvp", true);
+                (new GameEventEvent(
+                    $arena,
+                    GameEventEvent::EVENT_PVP
+                ))->call();
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-message"]);
             } else if($this->eventCalc() == "meetuphalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["meetup-last1"]);
@@ -126,12 +150,16 @@ class ArenaTask extends Task {
                 $arena->setFlag("bordershrink", false);
                 $arena->setFlag("pvp", false);
                 $arena->setFlag("invincibility", true);
-                $arena->border = 100;
+                $arena->setBorder(100);
                 foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {
                     $x = random_int(-100, 100);
                     $z = random_int(-100, 100);
                     $player->teleport(new Vector3($x, 100, $z));
                 }
+                (new GameEventEvent(
+                    $arena,
+                    GameEventEvent::EVENT_MEETUP
+                ))->call();
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["meetup-message"]);
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-10sec"]);
                 UHCRun::getInstance()->getScheduler()->scheduleDelayedTask(new EnablePvPTask($arena), 200);
@@ -143,6 +171,10 @@ class ArenaTask extends Task {
                 $arena->setFlag("pvp", false);
                 $arena->setFlag("break", false);
                 $arena->setFlag("invincibility", true);
+                (new GameEventEvent(
+                    $arena,
+                    GameEventEvent::EVENT_END
+                ))->call();
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["end-message"]);
             }
             foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {

@@ -126,7 +126,7 @@ class ScoreboardManager {
         } else {
             $data = ["", "An error occured."];
         }
-            foreach ($data as $scLine => $message) {
+        foreach ($data as $scLine => $message) {
             Scoreboard::setScoreLine($pl, $scLine, $message);
             $line = $scLine + 1;
             if (($this->networkBound[$pl->getName()][$line] ?? -1) === $message) {
