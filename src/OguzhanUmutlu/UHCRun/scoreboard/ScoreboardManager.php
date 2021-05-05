@@ -18,10 +18,6 @@ class ScoreboardManager {
         $this->arena = $arena;
     }
 
-    public function setStatus(string $status): void {
-        $this->status = $status;
-    }
-
     public function addPlayer(Player $pl): void {
         $this->scoreboards[$pl->getName()] = $pl;
         Scoreboard::setScore($pl, "§e§lUHC Run", Scoreboard::SORT_ASCENDING);
