@@ -4,15 +4,14 @@ namespace OguzhanUmutlu\UHCRun\events;
 
 use OguzhanUmutlu\UHCRun\arena\Arena;
 use OguzhanUmutlu\UHCRun\UHCRun;
+use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 
-class GameEventEvent extends PluginEvent {
+class GameEventEvent extends PluginEvent implements Cancellable {
     /*** @var Arena */
     private $arena;
     /*** @var int */
     private $event;
-    /*** @var array */
-    private $data;
     public static $handlerList = null;
 
     const EVENT_START = 0;
@@ -23,11 +22,10 @@ class GameEventEvent extends PluginEvent {
     const EVENT_MEETUP = 5;
     const EVENT_END = 6;
 
-    public function __construct(Arena $arena, int $event, array $data = []) {
+    public function __construct(Arena $arena, int $event) {
         parent::__construct(UHCRun::getInstance());
         $this->arena = $arena;
         $this->event = $event;
-        $this->data = $data;
     }
 
     /*** @return Arena */
@@ -38,10 +36,5 @@ class GameEventEvent extends PluginEvent {
     /*** @return int */
     public function getEvent(): int {
         return $this->event;
-    }
-
-    /*** @return array */
-    public function getData(): array {
-        return $this->data;
     }
 }

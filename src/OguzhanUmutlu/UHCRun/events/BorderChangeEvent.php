@@ -4,9 +4,10 @@ namespace OguzhanUmutlu\UHCRun\events;
 
 use OguzhanUmutlu\UHCRun\arena\Arena;
 use OguzhanUmutlu\UHCRun\UHCRun;
+use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 
-class BorderChangeEvent extends PluginEvent {
+class BorderChangeEvent extends PluginEvent implements Cancellable {
     /*** @var Arena */
     private $arena;
     /*** @var int */
@@ -40,14 +41,5 @@ class BorderChangeEvent extends PluginEvent {
     /*** @param int $border */
     public function setBorder(int $border): void {
         $this->arena->setBorder($border);
-    }
-
-    /*** @param bool $value */
-    public function setCancelled(bool $value = true): void {
-        if($value) {
-            $this->arena->border = $this->beforeBorder;
-        } else {
-            $this->arena->border = $this->afterBorder;
-        }
     }
 }

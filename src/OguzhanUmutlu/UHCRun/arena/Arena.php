@@ -61,22 +61,28 @@ class Arena {
 
     public function setFlag(string $flag, bool $value): void {
         if(!isset($this->flags[$flag])) return;
-        (new GameFlagUpdateEvent(
+        $ev = new GameFlagUpdateEvent(
             $this,
             $flag,
             $this->getFlag($flag),
             $value
-        ))->call();
-        $this->flags[$flag] = $value;
+        );
+        $ev->call();
+        if(!$ev->isCancelled()) {
+            $this->flags[$flag] = $value;
+        }
     }
 
     public function setBorder(int $size): void {
-        (new BorderChangeEvent(
+        $ev = new BorderChangeEvent(
             $this,
             $this->border,
             $size
-        ))->call();
-        $this->border = $size;
+        );
+        $ev->call();
+        if(!$ev->isCancelled()) {
+            $this->border = $size;
+        }
     }
 
     public function getPlayerManager(): PlayerManager {

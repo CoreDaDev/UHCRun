@@ -138,17 +138,20 @@ class PlayerManager {
         }
         $this->arena->scoreboardManager->removePlayer($player);
         if($die) {
-            $this->broadcast("message", str_replace(
-                ["{player}", "{players}"],
-                [$player->getName(), count($this->getAlivePlayers())-1],
-                UHCRun::getInstance()->messages["died-message"]
-            ));
-            $this->addDeadPlayer($player);
-            $this->addSpectator($player);
-            (new GamePlayerDeathEvent(
+            $ev = new GamePlayerDeathEvent(
                 $this->arena,
                 $player
-            ))->call();
+            );
+            $ev->call();
+            if(!$ev->isCancelled()) {
+                $this->broadcast("message", str_replace(
+                    ["{player}", "{players}"],
+                    [$player->getName(), count($this->getAlivePlayers())-1],
+                    UHCRun::getInstance()->messages["died-message"]
+                ));
+                $this->addDeadPlayer($player);
+                $this->addSpectator($player);
+            }
         } else {
             $this->broadcast("message", str_replace(
                 ["{player}", "{players}"],

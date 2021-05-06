@@ -1,8 +1,6 @@
 <?php
 
-
 namespace OguzhanUmutlu\UHCRun\events;
-
 
 use OguzhanUmutlu\UHCRun\arena\Arena;
 use OguzhanUmutlu\UHCRun\UHCRun;
@@ -10,7 +8,7 @@ use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 use pocketmine\Player;
 
-class GamePlayerDeathEvent extends PluginEvent implements Cancellable {
+class BorderDamageEvent extends PluginEvent implements Cancellable {
     /*** @var Arena */
     private $arena;
     /*** @var Player */

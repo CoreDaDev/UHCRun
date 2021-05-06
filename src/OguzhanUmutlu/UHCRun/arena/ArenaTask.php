@@ -67,19 +67,22 @@ class ArenaTask extends Task {
                 $player->setXpProgress($this->countdown/60);
             }
             if($this->countdown < 1) {
-                $arena->status = ArenaStatus::STATUS_STARTED;
-                $arena->setFlag("break", true);
-                $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["event-invincibility"]);
-                $this->countdown = 0;
-                foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {
-                    $x = random_int(0-$arena->border, $arena->border);
-                    $z = random_int(0-$arena->border, $arena->border);
-                    $player->teleport(new Position($x, 100, $z, $arena->level));
-                }
-                (new GameEventEvent(
+                $ev = new GameEventEvent(
                     $arena,
                     GameEventEvent::EVENT_START
-                ))->call();
+                );
+                $ev->call();
+                if(!$ev->isCancelled()) {
+                    $arena->status = ArenaStatus::STATUS_STARTED;
+                    $arena->setFlag("break", true);
+                    $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["event-invincibility"]);
+                    $this->countdown = 0;
+                    foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {
+                        $x = random_int(0-$arena->border, $arena->border);
+                        $z = random_int(0-$arena->border, $arena->border);
+                        $player->teleport(new Position($x, 100, $z, $arena->level));
+                    }
+                }
             }
         } else if($arena->status == ArenaStatus::STATUS_STARTED) {
             if(count($arena->getPlayerManager()->getAlivePlayers()) < 2) {
@@ -106,76 +109,91 @@ class ArenaTask extends Task {
                 $arena->border-=0.5;
             }
             if($this->eventCalc() == "invincibility") {
-                $arena->setFlag("invincibility", false);
-                (new GameEventEvent(
+                $ev = new GameEventEvent(
                     $arena,
                     GameEventEvent::EVENT_INVINCIBILITY
-                ))->call();
-                $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["invincibility-end"]);
+                );
+                $ev->call();
+                if(!$ev->isCancelled()) {
+                    $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["invincibility-end"]);
+                    $arena->setFlag("invincibility", false);
+                }
             } else if($this->eventCalc() == "bordershrinkhalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["border-shrink-last1"]);
             } else if($this->eventCalc() == "bordershrink") {
-                $arena->setFlag("bordershrink", true);
-                (new GameEventEvent(
+                $ev = new GameEventEvent(
                     $arena,
                     GameEventEvent::EVENT_BORDER_SHRINK
-                ))->call();
-                $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["border-shrink-message"]);
+                );
+                $ev->call();
+                if(!$ev->isCancelled()) {
+                    $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["border-shrink-message"]);
+                    $arena->setFlag("bordershrink", true);
+                }
             } else if($this->eventCalc() == "lasthealhalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["last-heal-last1"]);
             } else if($this->eventCalc() == "lastheal") {
-                $beforeHeal = [];
-                foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {
-                    $beforeHeal[$player->getName()] = $player->getHealth();
-                    $player->setHealth($player->getMaxHealth());
-                }
-                (new GameEventEvent(
+                $ev = new GameEventEvent(
                     $arena,
-                    GameEventEvent::EVENT_LAST_HEAL,
-                    $beforeHeal
-                ))->call();
-                $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["last-heal-message"]);
+                    GameEventEvent::EVENT_LAST_HEAL
+                );
+                $ev->call();
+                if(!$ev->isCancelled()) {
+                    $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["last-heal-message"]);
+                    foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {
+                        $player->setHealth($player->getMaxHealth());
+                    }
+                }
             } else if($this->eventCalc() == "pvphalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-last1"]);
             } else if($this->eventCalc() == "pvp") {
-                $arena->setFlag("pvp", true);
-                (new GameEventEvent(
+                $ev = new GameEventEvent(
                     $arena,
                     GameEventEvent::EVENT_PVP
-                ))->call();
-                $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-message"]);
+                );
+                $ev->call();
+                if(!$ev->isCancelled()) {
+                    $arena->setFlag("pvp", true);
+                    $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-message"]);
+                }
             } else if($this->eventCalc() == "meetuphalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["meetup-last1"]);
             } else if($this->eventCalc() == "meetup") {
-                $arena->setFlag("bordershrink", false);
-                $arena->setFlag("pvp", false);
-                $arena->setFlag("invincibility", true);
-                $arena->setBorder(100);
-                foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {
-                    $x = random_int(-100, 100);
-                    $z = random_int(-100, 100);
-                    $player->teleport(new Vector3($x, 100, $z));
-                }
-                (new GameEventEvent(
+                $ev = new GameEventEvent(
                     $arena,
                     GameEventEvent::EVENT_MEETUP
-                ))->call();
-                $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["meetup-message"]);
-                $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-10sec"]);
-                UHCRun::getInstance()->getScheduler()->scheduleDelayedTask(new EnablePvPTask($arena), 200);
+                );
+                $ev->call();
+                if(!$ev->isCancelled()) {
+                    $arena->setFlag("bordershrink", false);
+                    $arena->setFlag("pvp", false);
+                    $arena->setFlag("invincibility", true);
+                    $arena->setBorder(100);
+                    foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {
+                        $x = random_int(-100, 100);
+                        $z = random_int(-100, 100);
+                        $player->teleport(new Vector3($x, 100, $z));
+                    }
+                    $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["meetup-message"]);
+                    $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["pvp-10sec"]);
+                    UHCRun::getInstance()->getScheduler()->scheduleDelayedTask(new EnablePvPTask($arena), 200);
+                }
             } else if($this->eventCalc() == "endhalf") {
                 $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["end-last1"]);
             } else if($this->eventCalc() == "end") {
-                $arena->status = ArenaStatus::STATUS_ENDING;
-                $this->countdown = 5;
-                $arena->setFlag("pvp", false);
-                $arena->setFlag("break", false);
-                $arena->setFlag("invincibility", true);
-                (new GameEventEvent(
+                $ev = new GameEventEvent(
                     $arena,
                     GameEventEvent::EVENT_END
-                ))->call();
-                $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["end-message"]);
+                );
+                $ev->call();
+                if(!$ev->isCancelled()) {
+                    $arena->status = ArenaStatus::STATUS_ENDING;
+                    $this->countdown = 5;
+                    $arena->setFlag("pvp", false);
+                    $arena->setFlag("break", false);
+                    $arena->setFlag("invincibility", true);
+                    $arena->getPlayerManager()->broadcast("message", UHCRun::getInstance()->messages["end-message"]);
+                }
             }
             foreach($arena->getPlayerManager()->getAlivePlayers() as $player) {
                 if($this->arena->getPlayerManager()->getPlayerState($player) != PlayerStatus::PLAYER_OFFLINE) {

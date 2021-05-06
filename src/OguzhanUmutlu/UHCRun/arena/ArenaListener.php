@@ -6,6 +6,7 @@ use OguzhanUmutlu\UHCRun\UHCRun;
 use OguzhanUmutlu\UHCRun\utils\PlayerStatus;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\entity\EntityDamageByChildEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
@@ -19,10 +20,13 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemHeldEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\server\DataPacketReceiveEvent;
+use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
+use pocketmine\network\mcpe\protocol\SetHealthPacket;
 use pocketmine\Player;
 
 class ArenaListener implements Listener {
@@ -83,6 +87,9 @@ class ArenaListener implements Listener {
         $player = $e->getPlayer();
         if(!$player instanceof Player) return;
         if($this->arena->getPlayerManager()->getPlayerState($player) == PlayerStatus::PLAYER_OFFLINE) return;
+        if($e->getCause() == PlayerExhaustEvent::CAUSE_HEALTH_REGEN) {
+            $player->setHealth($player->getHealth()-$e->getAmount());
+        }
         if($this->arena->getFlag("invincibility")) {
             $player->setFood($player->getMaxFood());
             $player->setSaturation(20);
@@ -148,7 +155,7 @@ class ArenaListener implements Listener {
         $player = $e->getEntity();
         if(!$player instanceof Player) return;
         if($this->arena->getPlayerManager()->getPlayerState($player) == PlayerStatus::PLAYER_OFFLINE) return;
-        $e->setCancelled(true);
+        $player->setHealth($player->getHealth()-$e->getAmount());
     }
 
     public function OnMove(PlayerMoveEvent $e) {
