@@ -55,6 +55,7 @@ class UHCRun extends PluginBase {
                 " §eAlive Players: §b{players}§e/§b16",
                 " §cBorder: {border}x{border}",
                 " §cPvP: {pvp}",
+                " §dPosition: {x}, {y}, {z}",
                 "                                          "
             ]);UHCRun::getInstance()->getConfig()->save();UHCRun::getInstance()->getConfig()->reload();
         }

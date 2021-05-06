@@ -8,8 +8,11 @@ use OguzhanUmutlu\UHCRun\scoreboard\ScoreboardManager;
 use OguzhanUmutlu\UHCRun\UHCRun;
 use OguzhanUmutlu\UHCRun\utils\PlayerManager;
 use pocketmine\event\Event;
+use pocketmine\level\format\io\BaseLevelProvider;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 
 class Arena {
     public $listener;
@@ -115,5 +118,69 @@ class Arena {
 
         }
         rmdir($dir);
+    }
+
+    /*
+     * https://github.com/CzechPMDevs/MultiWorld
+     * */
+
+    public function showCoordinatesOnWorld(): bool {
+        $levelProvider = $this->level->getProvider();
+        if(!$levelProvider instanceof BaseLevelProvider) {
+            return false;
+        }
+        $compound = $levelProvider->getLevelData()->getCompoundTag("GameRules");
+        $compound->setString("showcoordinates", "showcoordinates");
+
+        $levelProvider->saveLevelData();
+        foreach ($this->level->getPlayers() as $player) {
+            $pk = new GameRulesChangedPacket();
+            $pk->gameRules = self::getLevelGameRules($this->level);
+            $player->dataPacket($pk);
+        }
+        return true;
+    }
+
+    public static function getLevelGameRules(Level $level): array {
+        $levelProvider = $level->getProvider();
+        $defgmrs = [
+            "doDaylightCycle" => [1, true],
+            "doMobLoot" => [1, true],
+            "doTileDrops" => [1, true],
+            "keepInventory" => [1, false],
+            "naturalRegeneration" => [1, true],
+            "pvp" => [1, true],
+            "showcoordinates" => [1, false],
+            "tntexplodes" => [1, true]
+        ];
+        if(!$levelProvider instanceof BaseLevelProvider) {
+            return $defgmrs;
+        }
+
+        $compound = $levelProvider->getLevelData()->getCompoundTag("GameRules");
+
+        if(!$compound instanceof CompoundTag) {
+            $levelProvider->getLevelData()->setTag(new CompoundTag("GameRules", []));
+            $compound = $levelProvider->getLevelData()->getCompoundTag("GameRules");
+            foreach ($defgmrs as $rule => [$type, $value]) {
+                $compound->setString($rule, is_bool($value) ? ($value ? "true" : "false") : (string)$value);
+            }
+        }
+
+        if($compound->count() == 0) {
+            foreach ($defgmrs as $rule => [$type, $value]) {
+                $compound->setString($rule, $value);
+            }
+        }
+        $gameRules = [];
+
+        foreach (array_keys($defgmrs) as $rule) {
+            if($compound->offsetExists($rule)) {
+                $value = is_bool($compound->getString($rule)) ? ($compound->getString($rule) ? "true" : "false") : (string)$compound->getString($rule);
+                $gameRules[$rule] = is_bool($value) ? [1, $value] : [2, $value];
+            }
+        }
+
+        return $gameRules;
     }
 }

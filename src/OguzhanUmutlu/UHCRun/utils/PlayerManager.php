@@ -129,6 +129,8 @@ class PlayerManager {
         $player->getArmorInventory()->clearAll();
         $player->getEnderChestInventory()->clearAll();
         $player->removeAllEffects();
+        $player->setXpProgress(0);
+        $player->setXpLevel(0);
         if(!$die && $this->arena->status > ArenaStatus::STATUS_STARTING) {
             $this->rejoin[$player->getName()] = [
                 "inventory" => $player->getInventory(),

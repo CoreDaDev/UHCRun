@@ -100,19 +100,25 @@ class ScoreboardManager {
                 default:
                     $event = "Nothing";
             }
-            $data = array_merge($data, array_map(function($n)use($min,$sec,$event){
+            $data = array_merge($data, array_map(function($n)use($min,$sec,$event,$pl){
                 return str_replace([
                     "{players}",
                     "{endsin}",
                     "{event}",
                     "{border}",
-                    "{pvp}"
+                    "{pvp}",
+                    "{x}",
+                    "{y}",
+                    "{z}"
                 ], [
                     count($this->arena->getPlayerManager()->getAlivePlayers()),
                     $min.":".$sec,
                     $event,
                     $this->arena->border,
-                    $this->arena->getFlag("pvp") ? "Disabled" : "Enabled"
+                    $this->arena->getFlag("pvp") ? "Enabled" : "Disabled",
+                    $pl->getFloorX(),
+                    $pl->getFloorY(),
+                    $pl->getFloorZ()
                 ], $n);
             },UHCRun::getInstance()->getConfig()->getNested("scoreboard.started")));
         } else if($this->arena->status == ArenaStatus::STATUS_ENDING) {

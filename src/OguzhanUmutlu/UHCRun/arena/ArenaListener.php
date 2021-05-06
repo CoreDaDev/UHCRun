@@ -81,6 +81,15 @@ class ArenaListener implements Listener {
         } else if(!$this->arena->getFlag("pvp") && $e instanceof EntityDamageByEntityEvent && $e->getDamager() instanceof Player) {
             $e->setCancelled(true);
         }
+        if(!$e->isCancelled() && $player->getGamemode() == 0) {
+            if($player->getHealth()-$e->getBaseDamage() < 0.1) {
+                $e->setCancelled(true);
+                foreach(array_merge($player->getInventory()->getContents(), $player->getArmorInventory()->getContents()) as $item) {
+                    $player->getLevel()->dropItem($player, $item);
+                }
+                $player->getLevel()->dropExperience($player, $player->getXpDropAmount());
+            }
+        }
     }
 
     public function OnExhaust(PlayerExhaustEvent $e) {
@@ -104,7 +113,7 @@ class ArenaListener implements Listener {
         if(!UHCRun::getInstance()->getConfig()->getNested("auto-efficiency5", true)) return;
         $contents = $player->getInventory()->getContents();
         foreach($contents as $i => $item) {
-            if($item instanceof Tool && !in_array(Enchantment::EFFICIENCY, array_map(function($n){return $n->getId();},$item->getEnchantments()))) {
+            if($item instanceof Tool && !in_array() && !in_array(Enchantment::EFFICIENCY, array_map(function($n){return $n->getId();},$item->getEnchantments()))) {
                 $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(Enchantment::EFFICIENCY), 5));
                 $contents[$i] = $item;
                 $e->setCancelled(true);
