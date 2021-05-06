@@ -25,6 +25,7 @@ use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
+use pocketmine\item\Sword;
 use pocketmine\item\Tool;
 use pocketmine\network\mcpe\protocol\SetHealthPacket;
 use pocketmine\Player;
@@ -113,7 +114,7 @@ class ArenaListener implements Listener {
         if(!UHCRun::getInstance()->getConfig()->getNested("auto-efficiency5", true)) return;
         $contents = $player->getInventory()->getContents();
         foreach($contents as $i => $item) {
-            if($item instanceof Tool && !in_array() && !in_array(Enchantment::EFFICIENCY, array_map(function($n){return $n->getId();},$item->getEnchantments()))) {
+            if($item instanceof Tool && !$item instanceof Sword && !in_array(Enchantment::EFFICIENCY, array_map(function($n){return $n->getId();},$item->getEnchantments()))) {
                 $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(Enchantment::EFFICIENCY), 5));
                 $contents[$i] = $item;
                 $e->setCancelled(true);
