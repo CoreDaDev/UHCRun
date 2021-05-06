@@ -28,27 +28,27 @@ class UHCRun extends PluginBase {
         $this->manager = new ArenaManager();
         $this->command = new UHCRunCommand();
         $this->saveDefaultConfig();
-        if(!UHCRun::getInstance()->getConfig()->getNested("ore-to-ingot")) {
-            UHCRun::getInstance()->getConfig()->setNested("ore-to-ingot", true);UHCRun::getInstance()->getConfig()->save();UHCRun::getInstance()->getConfig()->reload();
+        if(!$this->getConfig()->getNested("ore-to-ingot")) {
+            $this->getConfig()->setNested("ore-to-ingot", true);$this->getConfig()->save();$this->getConfig()->reload();
         }
-        if(!UHCRun::getInstance()->getConfig()->getNested("scoreboard.waiting")) {
-            UHCRun::getInstance()->getConfig()->setNested("scoreboard.waiting", [
+        if(!$this->getConfig()->getNested("scoreboard.waiting")) {
+            $this->getConfig()->setNested("scoreboard.waiting", [
                 " ",
                 " §cWaiting players...",
                 " §ePlayers: §b{players}§e/§b16",
                 "                                          "
-            ]);UHCRun::getInstance()->getConfig()->save();UHCRun::getInstance()->getConfig()->reload();
+            ]);$this->getConfig()->save();$this->getConfig()->reload();
         }
-        if(!UHCRun::getInstance()->getConfig()->getNested("scoreboard.starting")) {
-            UHCRun::getInstance()->getConfig()->setNested("scoreboard.starting", [
+        if(!$this->getConfig()->getNested("scoreboard.starting")) {
+            $this->getConfig()->setNested("scoreboard.starting", [
                 " ",
                 " §aGame is starting in§b {seconds}§a seconds",
                 " §ePlayers: §b{players}§e/§b16",
                 "                                          "
-            ]);UHCRun::getInstance()->getConfig()->save();UHCRun::getInstance()->getConfig()->reload();
+            ]);$this->getConfig()->save();$this->getConfig()->reload();
         }
-        if(!UHCRun::getInstance()->getConfig()->getNested("scoreboard.started")) {
-            UHCRun::getInstance()->getConfig()->setNested("scoreboard.started", [
+        if(!$this->getConfig()->getNested("scoreboard.started")) {
+            $this->getConfig()->setNested("scoreboard.started", [
                 " ",
                 " §eEvent:",
                 " §b§l * §r§a{event}",
@@ -57,14 +57,14 @@ class UHCRun extends PluginBase {
                 " §cPvP: {pvp}",
                 " §dPosition: {x}, {y}, {z}",
                 "                                          "
-            ]);UHCRun::getInstance()->getConfig()->save();UHCRun::getInstance()->getConfig()->reload();
+            ]);$this->getConfig()->save();$this->getConfig()->reload();
         }
-        if(!UHCRun::getInstance()->getConfig()->getNested("scoreboard.ending")) {
-            UHCRun::getInstance()->getConfig()->setNested("scoreboard.ending", [
+        if(!$this->getConfig()->getNested("scoreboard.ending")) {
+            $this->getConfig()->setNested("scoreboard.ending", [
                 " ",
                 " §cGame restarts in §b{seconds}§c seconds",
                 "                                          "
-            ]);UHCRun::getInstance()->getConfig()->save();UHCRun::getInstance()->getConfig()->reload();
+            ]);$this->getConfig()->save();$this->getConfig()->reload();
         }
     }
     public static function getInstance(): UHCRun {

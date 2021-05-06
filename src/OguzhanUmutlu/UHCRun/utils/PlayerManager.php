@@ -34,8 +34,9 @@ class PlayerManager {
     }
 
     public function broadcast(string $type, string $message) {
+        $brlog = [];
         foreach($this->getAllPlayers() as $player) {
-            if($player instanceof Player) {
+            if($player instanceof Player && !isset($brlog[$player->getName()])) {
                 switch($type) {
                     case self::BROADCAST_MESSAGE:
                         $player->sendMessage($message);
@@ -47,6 +48,7 @@ class PlayerManager {
                         $player->sendPopup($message);
                         break;
                 }
+                $brlog[$player->getName()] = true;
             }
         }
     }
@@ -124,6 +126,7 @@ class PlayerManager {
      */
     public $rejoin = [];
     public function removeAlivePlayer(Player $player, bool $die = false, bool $teleport = true) {
+        if(!in_array($player->getName(), $this->mapNames($this->alivePlayers))) return;
         $player->getInventory()->clearAll();
         $player->getCursorInventory()->clearAll();
         $player->getArmorInventory()->clearAll();
@@ -138,7 +141,7 @@ class PlayerManager {
                 "position" => $player->getPosition()
             ];
         }
-        $this->arena->scoreboardManager->removePlayer($player);
+        if(in_array($player->getName(), $this->mapNames($this->alivePlayers)))unset($this->alivePlayers[array_search($player->getName(), $this->mapNames($this->alivePlayers))]);
         if($die) {
             $ev = new GamePlayerDeathEvent(
                 $this->arena,
@@ -151,10 +154,15 @@ class PlayerManager {
                     [$player->getName(), count($this->getAlivePlayers())-1],
                     UHCRun::getInstance()->messages["died-message"]
                 ));
+                foreach(array_merge($player->getInventory()->getContents(), $player->getArmorInventory()->getContents()) as $item) {
+                    $player->getLevel()->dropItem($player, $item);
+                }
+                $player->getLevel()->dropExperience($player, $player->getXpDropAmount());
                 $this->addDeadPlayer($player);
                 $this->addSpectator($player);
             }
         } else {
+            $this->arena->scoreboardManager->removePlayer($player);
             $this->broadcast("message", str_replace(
                 ["{player}", "{players}"],
                 [$player->getName(), count($this->getAlivePlayers())-1],
@@ -162,7 +170,6 @@ class PlayerManager {
             ));
             if($teleport)$player->teleport(UHCRun::getInstance()->getMainLobby());
         }
-        if(in_array($player->getName(), $this->mapNames($this->alivePlayers)))unset($this->alivePlayers[array_search($player->getName(), $this->mapNames($this->alivePlayers))]);
     }
 
     public function addDeadPlayer(Player $player) {

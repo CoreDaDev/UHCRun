@@ -157,4 +157,8 @@ class ScoreboardManager {
         unset($this->networkBound[$pl->getName()]);
         Scoreboard::removeScore($pl);
     }
+
+    public function getPlayers(): array {
+        return array_keys($this->scoreboards);
+    }
 }

@@ -41,6 +41,7 @@ class ArenaListener implements Listener {
         if(!$player instanceof Player) return;
         if($this->arena->getPlayerManager()->getPlayerState($player) == PlayerStatus::PLAYER_OFFLINE) return;
         if($e->getTarget()->getFolderName() != $this->arena->levelName && $e->getTarget()->getFolderName() != UHCRun::getInstance()->getWaitLobby()->getLevel()->getFolderName()) {
+            $this->arena->scoreboardManager->removePlayer($player);
             $this->arena->getPlayerManager()->removeAlivePlayer($player, false, false);
             $this->arena->getPlayerManager()->removeSpectator($player);
             $this->arena->getPlayerManager()->removeDeadPlayer($player);
@@ -56,6 +57,9 @@ class ArenaListener implements Listener {
             $this->arena->getPlayerManager()->removeAlivePlayer($player);
             $this->arena->getPlayerManager()->removeDeadPlayer($player);
             $this->arena->getPlayerManager()->removeSpectator($player);
+            $player->setGamemode(0);
+            $player->teleport(UHCRun::getInstance()->getMainLobby());
+            $this->arena->scoreboardManager->removePlayer($player);
         }
     }
 
@@ -68,6 +72,7 @@ class ArenaListener implements Listener {
     public function OnQuit(PlayerQuitEvent $e) {
         $player = $e->getPlayer();
         if($this->arena->getPlayerManager()->getPlayerState($player) != PlayerStatus::PLAYER_ALIVE) return;
+        $this->arena->scoreboardManager->removePlayer($player);
         $this->arena->getPlayerManager()->removeAlivePlayer($player);
         $this->arena->getPlayerManager()->removeDeadPlayer($player);
         $this->arena->getPlayerManager()->removeSpectator($player);
@@ -85,10 +90,7 @@ class ArenaListener implements Listener {
         if(!$e->isCancelled() && $player->getGamemode() == 0) {
             if($player->getHealth()-$e->getBaseDamage() < 0.1) {
                 $e->setCancelled(true);
-                foreach(array_merge($player->getInventory()->getContents(), $player->getArmorInventory()->getContents()) as $item) {
-                    $player->getLevel()->dropItem($player, $item);
-                }
-                $player->getLevel()->dropExperience($player, $player->getXpDropAmount());
+                $this->arena->listener->OnDeath(new PlayerDeathEvent($player, []));
             }
         }
     }
@@ -97,9 +99,6 @@ class ArenaListener implements Listener {
         $player = $e->getPlayer();
         if(!$player instanceof Player) return;
         if($this->arena->getPlayerManager()->getPlayerState($player) == PlayerStatus::PLAYER_OFFLINE) return;
-        if($e->getCause() == PlayerExhaustEvent::CAUSE_HEALTH_REGEN) {
-            $player->setHealth($player->getHealth()-$e->getAmount());
-        }
         if($this->arena->getFlag("invincibility")) {
             $player->setFood($player->getMaxFood());
             $player->setSaturation(20);

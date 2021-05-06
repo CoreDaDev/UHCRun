@@ -49,6 +49,15 @@ class ArenaManager {
             }
             return false;
         }
+        foreach($arena->getPlayerManager()->getAllPlayers() as $x) {
+            $arena->getPlayerManager()->removeAlivePlayer($x);
+            $arena->getPlayerManager()->removeDeadPlayer($x);
+            $arena->getPlayerManager()->removeSpectator($x);
+        }
+        foreach($arena->scoreboardManager->getPlayers() as $player) {
+            $player = UHCRun::getInstance()->getServer()->getPlayerExact($player);
+            if($player instanceof Player && $player->isOnline())$arena->scoreboardManager->removePlayer($player);
+        }
         $arena->removeWorld();
         if($arena->playerManager) {
             foreach($arena->getPlayerManager()->getAllPlayers() as $player) {
