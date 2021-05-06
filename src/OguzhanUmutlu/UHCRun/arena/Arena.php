@@ -163,7 +163,7 @@ class Arena {
             $levelProvider->getLevelData()->setTag(new CompoundTag("GameRules", []));
             $compound = $levelProvider->getLevelData()->getCompoundTag("GameRules");
             foreach ($defgmrs as $rule => [$type, $value]) {
-                $compound->setString($rule, is_bool($value) ? ($value ? "true" : "false") : (string)$value);
+                $compound->setString($rule, $value ? "true" : "false");
             }
         }
 
@@ -176,8 +176,8 @@ class Arena {
 
         foreach (array_keys($defgmrs) as $rule) {
             if($compound->offsetExists($rule)) {
-                $value = is_bool($compound->getString($rule)) ? ($compound->getString($rule) ? "true" : "false") : (string)$compound->getString($rule);
-                $gameRules[$rule] = is_bool($value) ? [1, $value] : [2, $value];
+                $value = $compound->getString($rule) ? "true" : "false";
+                $gameRules[$rule] = [2, $value];
             }
         }
 
